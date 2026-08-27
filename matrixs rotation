@@ -1,0 +1,73 @@
+import java.io.*;
+import java.util.*;
+
+public class Solution {
+
+    // 1. Matrix rotation logic
+    public static void matrixRotation(List<List<Integer>> matrix, int r) {
+        int m = matrix.size();
+        int n = matrix.get(0).size();
+        int numLayers = Math.min(m, n) / 2;
+
+        for (int layer = 0; layer < numLayers; layer++) {
+            List<int[]> coords = new ArrayList<>();
+
+            // Extract coordinates counter-clockwise
+            for (int j = layer; j < n - layer; j++) coords.add(new int[]{layer, j});
+            for (int i = layer + 1; i < m - layer; i++) coords.add(new int[]{i, n - 1 - layer});
+            for (int j = n - 2 - layer; j >= layer; j--) coords.add(new int[]{m - 1 - layer, j});
+            for (int i = m - 2 - layer; i > layer; i--) coords.add(new int[]{i, layer});
+
+            int k = coords.size();
+            int shift = r % k;
+
+            // Save original ring values
+            int[] vals = new int[k];
+            for (int i = 0; i < k; i++) {
+                int[] pos = coords.get(i);
+                vals[i] = matrix.get(pos[0]).get(pos[1]);
+            }
+
+            // Write rotated values back
+            for (int i = 0; i < k; i++) {
+                int[] pos = coords.get(i);
+                matrix.get(pos[0]).set(pos[1], vals[(i + shift) % k]);
+            }
+        }
+
+        // Print final result
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                sb.append(matrix.get(i).get(j)).append(j == n - 1 ? "" : " ");
+            }
+            sb.append("\n");
+        }
+        System.out.print(sb);
+    }
+
+    // 2. Required Main Method (Reads input from stdout/stdin)
+    public static void main(String[] args) throws IOException {
+        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
+
+        String[] firstLine = bufferedReader.readLine().trim().split(" ");
+        int m = Integer.parseInt(firstLine[0]);
+        int n = Integer.parseInt(firstLine[1]);
+        int r = Integer.parseInt(firstLine[2]);
+
+        List<List<Integer>> matrix = new ArrayList<>();
+
+        for (int i = 0; i < m; i++) {
+            String[] rowItems = bufferedReader.readLine().trim().split(" ");
+            List<Integer> row = new ArrayList<>();
+            for (int j = 0; j < n; j++) {
+                row.add(Integer.parseInt(rowItems[j]));
+            }
+            matrix.add(row);
+        }
+
+        matrixRotation(matrix, r);
+
+        bufferedReader.close();
+    }
+}
